@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: team-quota
+  namespace: team-{{ .Values.teamName }}
+spec:
+  hard:
+    requests.cpu: {{ if eq .Values.size "S" }}"2"{{ else if eq .Values.size "M" }}"4"{{ else }}"8"{{ end }}
+    requests.memory: {{ if eq .Values.size "S" }}4Gi{{ else if eq .Values.size "M" }}8Gi{{ else }}16Gi{{ end }}
+    limits.cpu: {{ if eq .Values.size "S" }}"4"{{ else if eq .Values.size "M" }}"8"{{ else }}"16"{{ end }}
+    limits.memory: {{ if eq .Values.size "S" }}8Gi{{ else if eq .Values.size "M" }}16Gi{{ else }}32Gi{{ end }}
+    pods: {{ if eq .Values.size "S" }}"20"{{ else if eq .Values.size "M" }}"40"{{ else }}"80"{{ end }}
+    services: "20"
+    persistentvolumeclaims: {{ if eq .Values.size "S" }}"5"{{ else if eq .Values.size "M" }}"10"{{ else }}"20"{{ end }}
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: team-limits
+  namespace: team-{{ .Values.teamName }}
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        cpu: 100m
+        memory: 128Mi
+      default:
+        cpu: 500m
+        memory: 512Mi
+      max:
+        cpu: "2"
+        memory: 4Gi

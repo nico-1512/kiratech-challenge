@@ -1,0 +1,55 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: team-environment-application
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [argoproj.io]
+        apiVersions: [v1alpha1]
+        operations: [CREATE, UPDATE]
+        resources: [applications]
+  matchConditions:
+    - name: team-application-in-argocd
+      expression: "request.namespace == 'argocd' && object.metadata.name.startsWith('team-')"
+  validations:
+    - expression: >-
+        has(object.spec.source.helm) &&
+        has(object.spec.source.helm.valuesObject) &&
+        has(object.spec.source.helm.valuesObject.teamName) &&
+        size(object.spec.source.helm.valuesObject.teamName) <= 63 &&
+        object.spec.source.helm.valuesObject.teamName.matches('^[a-z0-9]([-a-z0-9]*[a-z0-9])?$') &&
+        object.metadata.name == 'team-' + object.spec.source.helm.valuesObject.teamName
+      message: "team-* Applications require a DNS-label teamName matching the Application name (team-<teamName>)."
+    - expression: >-
+        has(object.spec.source.helm) &&
+        has(object.spec.source.helm.valuesObject) &&
+        has(object.spec.source.helm.valuesObject.size) &&
+        object.spec.source.helm.valuesObject.size in ['S', 'M', 'L']
+      message: "team-* Applications require size S, M, or L."
+    - expression: >-
+        has(object.spec.source.helm) &&
+        has(object.spec.source.helm.valuesObject) &&
+        has(object.spec.source.helm.valuesObject.teamRepository) &&
+        object.spec.source.helm.valuesObject.teamRepository.matches('^(https://|ssh://|git@)[^\\s]+$')
+      message: "team-* Applications require teamRepository as an HTTPS or SSH Git URL."
+    - expression: >-
+        !has(object.spec.source.helm) ||
+        !has(object.spec.source.helm.valuesObject) ||
+        !has(object.spec.source.helm.valuesObject.teamPath) ||
+        (object.spec.source.helm.valuesObject.teamPath.matches('^[A-Za-z0-9._/-]+$') &&
+         !object.spec.source.helm.valuesObject.teamPath.contains('..'))
+      message: "teamPath, when set, must be a non-empty repository-relative path."
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: team-environment-application
+spec:
+  policyName: team-environment-application
+  validationActions: [Deny]
+  matchResources:
+    namespaceSelector:
+      matchLabels:
+        kubernetes.io/metadata.name: argocd

@@ -1,0 +1,57 @@
+flowchart TB
+  operator[Platform engineer / kubectl client]
+  endpoint[Stable Kubernetes API endpoint<br/>127.0.0.1:&lt;kind-port&gt;]
+
+  subgraph vm[Reference VM host]
+    docker[Docker engine + kind network]
+    haproxy[Kind external load balancer<br/>HAProxy container]
+    apiPool[3 kube-apiserver backends]
+    subgraph cluster[Kind Kubernetes cluster]
+      subgraph cp1[Control-plane node 1]
+        api1[kube-apiserver + control-plane pods]
+        etcd1[(etcd member 1)]
+      end
+      subgraph cp2[Control-plane node 2]
+        api2[kube-apiserver + control-plane pods]
+        etcd2[(etcd member 2)]
+      end
+      subgraph cp3[Control-plane node 3]
+        api3[kube-apiserver + control-plane pods]
+        etcd3[(etcd member 3)]
+      end
+      worker[Worker node]
+      platform[Argo CD + Envoy Gateway + team workloads<br/>scheduled as pods]
+      calico[Calico CNI on nodes<br/>pod network 192.168.0.0/16<br/>enforces NetworkPolicy]
+      vip[kube-vip cloud provider + DaemonSet<br/>LoadBalancer services only]
+    end
+  end
+
+  operator --> endpoint
+  endpoint --> haproxy
+  haproxy --> apiPool
+  apiPool --> api1
+  apiPool --> api2
+  apiPool --> api3
+  api1 --- etcd1
+  api2 --- etcd2
+  api3 --- etcd3
+  etcd1 <--> etcd2
+  etcd2 <--> etcd3
+  etcd3 <--> etcd1
+  docker --- haproxy
+  docker --- cluster
+  calico --- cp1
+  calico --- cp2
+  calico --- cp3
+  calico --- worker
+  platform --- worker
+  vip --- worker
+
+  classDef client fill:#fff4dc,stroke:#ad7400,color:#392500;
+  classDef endpoint fill:#f2e9ff,stroke:#7045a5,color:#2d1943;
+  classDef node fill:#e8f1ff,stroke:#3267a8,color:#173553;
+  classDef component fill:#eff8ee,stroke:#4c8147,color:#1f3a1d;
+  class operator client;
+  class endpoint,haproxy endpoint;
+  class api1,api2,api3,worker node;
+  class etcd1,etcd2,etcd3,platform,calico,vip component;

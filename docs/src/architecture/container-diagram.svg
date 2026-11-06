@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="880" viewBox="0 0 1440 880">
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M1,1 L11,6 L1,11 Z" fill="#52657a"/></marker>
+    <style>
+      text { font-family: Arial, sans-serif; fill: #172b3a; }
+      .title { font-size: 30px; font-weight: 700; }
+      .subtitle { font-size: 16px; fill: #52657a; }
+      .boundary { fill: #f7f9fc; stroke: #49627a; stroke-width: 2.5; }
+      .external { fill: #f2e9ff; stroke: #7045a5; stroke-width: 2; }
+      .actor { fill: #fff4dc; stroke: #ad7400; stroke-width: 2; }
+      .container { fill: #e8f1ff; stroke: #3267a8; stroke-width: 2; }
+      .resource { fill: #eff8ee; stroke: #4c8147; stroke-width: 2; }
+      .box-title { font-size: 20px; font-weight: 700; }
+      .body { font-size: 15px; }
+      .small { font-size: 13px; fill: #52657a; }
+      .edge { fill: none; stroke: #52657a; stroke-width: 2.5; marker-end: url(#arrow); }
+      .edge-dash { fill: none; stroke: #52657a; stroke-width: 2.2; stroke-dasharray: 7 6; marker-end: url(#arrow); }
+      .edge-label { font-size: 13px; fill: #34495e; }
+    </style>
+  </defs>
+  <rect width="1440" height="880" fill="#ffffff"/>
+  <text x="48" y="55" class="title">C4 Container diagram — platform control plane</text>
+  <text x="48" y="82" class="subtitle">Reference setup: Argo CD and team workloads run in the same Kubernetes cluster.</text>
+
+  <rect x="55" y="350" width="210" height="115" rx="15" class="actor"/>
+  <text x="160" y="394" text-anchor="middle" class="box-title">Platform engineer</text>
+  <text x="160" y="424" text-anchor="middle" class="body">commits requests</text>
+
+  <rect x="315" y="320" width="245" height="175" rx="15" class="external"/>
+  <text x="437" y="357" text-anchor="middle" class="box-title">Git repository</text>
+  <text x="337" y="390" class="body">• EasyKind cluster config</text>
+  <text x="337" y="418" class="body">• GitOps platform and chart</text>
+  <text x="337" y="446" class="body">• team request + workloads</text>
+  <text x="337" y="474" class="small">sample uses this repository</text>
+
+  <rect x="610" y="125" width="780" height="690" rx="22" class="boundary"/>
+  <text x="640" y="165" class="box-title">Reference Kubernetes cluster</text>
+
+  <rect x="660" y="220" width="300" height="140" rx="14" class="container"/>
+  <text x="810" y="258" text-anchor="middle" class="box-title">Argo CD</text>
+  <text x="685" y="291" class="body">root app + request watcher</text>
+  <text x="685" y="318" class="body">renders Helm chart</text>
+  <text x="685" y="343" class="body">syncs child workload app</text>
+
+  <rect x="1030" y="220" width="310" height="140" rx="14" class="container"/>
+  <text x="1185" y="258" text-anchor="middle" class="box-title">Kubernetes API server</text>
+  <text x="1055" y="292" class="body">validates and stores requests</text>
+  <text x="1055" y="322" class="body">creates team resources</text>
+
+  <rect x="1030" y="415" width="310" height="115" rx="14" class="container"/>
+  <text x="1185" y="454" text-anchor="middle" class="box-title">Admission policy</text>
+  <text x="1055" y="485" class="body">team name, size, Git URL</text>
+  <text x="1055" y="510" class="small">rejects invalid requests at API</text>
+
+  <rect x="1030" y="590" width="310" height="105" rx="14" class="resource"/>
+  <text x="1185" y="630" text-anchor="middle" class="box-title">Stacked etcd</text>
+  <text x="1185" y="662" text-anchor="middle" class="body">3 members, one per control plane</text>
+
+  <rect x="660" y="430" width="300" height="145" rx="14" class="resource"/>
+  <text x="810" y="468" text-anchor="middle" class="box-title">Team namespace</text>
+  <text x="685" y="502" class="body">Quota • LimitRange • team RBAC</text>
+  <text x="685" y="531" class="body">default-deny + required allowances</text>
+  <text x="685" y="558" class="small">created by the team environment chart</text>
+
+  <rect x="660" y="600" width="300" height="75" rx="14" class="container"/>
+  <text x="810" y="633" text-anchor="middle" class="box-title">Envoy Gateway</text>
+  <text x="685" y="658" class="small">reconciles Gateway API resources</text>
+
+  <rect x="660" y="700" width="300" height="90" rx="14" class="resource"/>
+  <text x="810" y="737" text-anchor="middle" class="box-title">Team workloads</text>
+  <text x="685" y="770" class="body">child Argo CD Application</text>
+
+  <rect x="1030" y="730" width="310" height="62" rx="14" class="resource"/>
+  <text x="1185" y="756" text-anchor="middle" class="box-title">Calico CNI</text>
+  <text x="1185" y="778" text-anchor="middle" class="small">enforces NetworkPolicies</text>
+
+  <path d="M265 408 L315 408" class="edge"/>
+  <text x="290" y="394" text-anchor="middle" class="edge-label">commit</text>
+  <path d="M560 360 L610 360 L610 290 L660 290" class="edge"/>
+  <text x="585" y="343" text-anchor="middle" class="edge-label">sync</text>
+  <path d="M960 290 L1030 290" class="edge"/>
+  <text x="995" y="275" text-anchor="middle" class="edge-label">apply</text>
+  <path d="M1185 360 L1185 415" class="edge"/>
+  <text x="1200" y="392" class="edge-label">admission</text>
+  <path d="M1340 320 L1365 320 L1365 642 L1340 642" class="edge-dash"/>
+  <text x="1355" y="555" text-anchor="middle" class="edge-label">persist</text>
+  <path d="M810 360 L810 430" class="edge"/>
+  <text x="827" y="402" class="edge-label">render + sync</text>
+  <path d="M810 675 L810 700" class="edge"/>
+  <text x="827" y="694" class="edge-label">routes traffic</text>
+  <path d="M1185 360 L1185 390 L995 390 L995 638 L960 638" class="edge-dash"/>
+  <text x="1008" y="570" class="edge-label">watch API</text>
+  <path d="M960 520 L1010 520 L1010 760 L1030 760" class="edge-dash"/>
+  <text x="995" y="545" text-anchor="middle" class="edge-label">policy</text>
+</svg>

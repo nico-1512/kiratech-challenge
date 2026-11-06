@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["teamName", "size", "teamRepository"],
+  "properties": {
+    "teamName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63,
+      "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+    },
+    "size": {
+      "type": "string",
+      "enum": ["S", "M", "L"]
+    },
+    "teamRepository": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(https://|ssh://|git@)[^\\s]+$"
+    },
+    "teamPath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9._/-]+$"
+    }
+  }
+}

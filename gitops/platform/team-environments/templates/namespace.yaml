@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: team-{{ .Values.teamName }}
+  labels:
+    app.kubernetes.io/managed-by: argocd
+    platform.example.io/team: {{ .Values.teamName | quote }}

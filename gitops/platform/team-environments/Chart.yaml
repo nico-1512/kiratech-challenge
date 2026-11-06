@@ -1,0 +1,6 @@
+apiVersion: v2
+name: team-environment
+description: Namespace controls and a workload Argo CD Application for one team
+type: application
+version: 0.1.0
+appVersion: "1.0"

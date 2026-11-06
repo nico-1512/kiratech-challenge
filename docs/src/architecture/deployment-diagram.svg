@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="960" viewBox="0 0 1600 960">
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M1,1 L11,6 L1,11 Z" fill="#52657a"/></marker>
+    <style>
+      text { font-family: Arial, sans-serif; fill: #172b3a; }
+      .title { font-size: 30px; font-weight: 700; }
+      .subtitle { font-size: 16px; fill: #52657a; }
+      .host { fill: #f7f9fc; stroke: #49627a; stroke-width: 2.5; }
+      .network { fill: #f0f6fb; stroke: #6a8298; stroke-width: 2; stroke-dasharray: 8 6; }
+      .client { fill: #fff4dc; stroke: #ad7400; stroke-width: 2; }
+      .endpoint { fill: #f2e9ff; stroke: #7045a5; stroke-width: 2; }
+      .node { fill: #e8f1ff; stroke: #3267a8; stroke-width: 2; }
+      .component { fill: #eff8ee; stroke: #4c8147; stroke-width: 2; }
+      .box-title { font-size: 19px; font-weight: 700; }
+      .body { font-size: 14px; }
+      .small { font-size: 12px; fill: #52657a; }
+      .edge { fill: none; stroke: #52657a; stroke-width: 2.4; marker-end: url(#arrow); }
+      .edge-dash { fill: none; stroke: #2f78a7; stroke-width: 3; stroke-dasharray: 10 7; }
+      .edge-label { font-size: 13px; fill: #34495e; }
+    </style>
+  </defs>
+  <rect width="1600" height="960" fill="#ffffff"/>
+  <text x="48" y="55" class="title">C4 Deployment diagram — reference cluster</text>
+  <text x="48" y="82" class="subtitle">One VM host runs Docker and a four-node Kind cluster; the API endpoint is provided by Kind HAProxy.</text>
+
+  <rect x="55" y="112" width="300" height="95" rx="14" class="client"/>
+  <text x="205" y="151" text-anchor="middle" class="box-title">Operator client</text>
+  <text x="205" y="180" text-anchor="middle" class="body">kubectl / automation</text>
+
+  <rect x="415" y="112" width="380" height="95" rx="14" class="endpoint"/>
+  <text x="605" y="151" text-anchor="middle" class="box-title">Stable API endpoint</text>
+  <text x="605" y="180" text-anchor="middle" class="body">127.0.0.1:&lt;kind-port&gt; → HAProxy</text>
+  <path d="M355 160 L415 160" class="edge"/>
+
+  <rect x="55" y="245" width="1490" height="660" rx="24" class="host"/>
+  <text x="85" y="287" class="box-title">VM host</text>
+  <text x="85" y="312" class="small">Docker engine and kind network</text>
+
+  <rect x="100" y="335" width="1400" height="525" rx="20" class="network"/>
+  <text x="125" y="371" class="box-title">Kind node containers</text>
+
+  <rect x="135" y="495" width="220" height="135" rx="14" class="endpoint"/>
+  <text x="245" y="532" text-anchor="middle" class="box-title">HAProxy</text>
+  <text x="158" y="565" class="body">Kind external LB</text>
+  <text x="158" y="593" class="body">health-checks API</text>
+  <text x="158" y="618" class="small">container on kind network</text>
+
+  <rect x="405" y="395" width="770" height="55" rx="12" class="endpoint"/>
+  <text x="790" y="429" text-anchor="middle" class="box-title">API server backend pool — 3 healthy kube-apiserver endpoints</text>
+
+  <rect x="405" y="480" width="230" height="185" rx="14" class="node"/>
+  <text x="520" y="517" text-anchor="middle" class="box-title">Control plane 1</text>
+  <text x="430" y="551" class="body">kube-apiserver</text>
+  <text x="430" y="578" class="body">scheduler + controller</text>
+  <rect x="430" y="600" width="180" height="50" rx="10" class="component"/>
+  <text x="520" y="631" text-anchor="middle" class="body">etcd member 1</text>
+
+  <rect x="675" y="480" width="230" height="185" rx="14" class="node"/>
+  <text x="790" y="517" text-anchor="middle" class="box-title">Control plane 2</text>
+  <text x="700" y="551" class="body">kube-apiserver</text>
+  <text x="700" y="578" class="body">scheduler + controller</text>
+  <rect x="700" y="600" width="180" height="50" rx="10" class="component"/>
+  <text x="790" y="631" text-anchor="middle" class="body">etcd member 2</text>
+
+  <rect x="945" y="480" width="230" height="185" rx="14" class="node"/>
+  <text x="1060" y="517" text-anchor="middle" class="box-title">Control plane 3</text>
+  <text x="970" y="551" class="body">kube-apiserver</text>
+  <text x="970" y="578" class="body">scheduler + controller</text>
+  <rect x="970" y="600" width="180" height="50" rx="10" class="component"/>
+  <text x="1060" y="631" text-anchor="middle" class="body">etcd member 3</text>
+
+  <rect x="1215" y="480" width="235" height="185" rx="14" class="node"/>
+  <text x="1332" y="517" text-anchor="middle" class="box-title">Worker node</text>
+  <text x="1240" y="551" class="body">kubelet + containerd</text>
+  <text x="1240" y="578" class="body">application pods</text>
+  <text x="1240" y="608" class="small">minimum 1 worker</text>
+  <text x="1240" y="636" class="small">more may be added</text>
+
+  <rect x="405" y="670" width="690" height="130" rx="14" class="component"/>
+  <text x="750" y="710" text-anchor="middle" class="box-title">Calico CNI</text>
+  <text x="435" y="744" class="body">DaemonSet on each node • pod network 192.168.0.0/16</text>
+  <text x="435" y="775" class="body">Provides pod networking and enforces NetworkPolicy</text>
+
+  <rect x="1135" y="670" width="315" height="130" rx="14" class="component"/>
+  <text x="1292" y="710" text-anchor="middle" class="box-title">Cluster services</text>
+  <text x="1160" y="744" class="body">Argo CD + Envoy Gateway pods</text>
+  <text x="1160" y="775" class="body">team workloads + kube-vip LB IPs</text>
+
+  <path d="M605 207 L605 230 L370 230 L370 470 L245 470 L245 495" class="edge"/>
+  <text x="485" y="224" text-anchor="middle" class="edge-label">API requests</text>
+  <path d="M355 560 L380 560 L380 422 L405 422" class="edge"/>
+  <path d="M520 450 L520 480" class="edge"/>
+  <path d="M790 450 L790 480" class="edge"/>
+  <path d="M1060 450 L1060 480" class="edge"/>
+  <path d="M1095 735 L1135 735" class="edge-dash"/>
+  <text x="1115" y="720" text-anchor="middle" class="edge-label">CNI / policies</text>
+
+  <text x="110" y="886" class="small">kube-vip handles LoadBalancer services; Kind HAProxy is the API endpoint. Three etcd members tolerate one member failure.</text>
+</svg>

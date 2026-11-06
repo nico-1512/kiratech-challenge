@@ -1,0 +1,38 @@
+flowchart LR
+  engineer[Platform engineer]
+  git[(Git repository<br/>cluster config, GitOps,<br/>team requests and workloads)]
+
+  subgraph cluster[Reference Kubernetes cluster]
+    argocd[Argo CD<br/>root app + team request app]
+    api[Kubernetes API server]
+    policy[ValidatingAdmissionPolicy<br/>team request validation]
+    etcd[(Stacked etcd<br/>3 members)]
+    env[Team namespace<br/>Quota + LimitRange + RBAC]
+    netpol[Default-deny NetworkPolicies]
+    envoy[Envoy Gateway<br/>Gateway API controller]
+    workloads[Team workloads<br/>child Argo CD Application]
+    calico[Calico CNI<br/>network policy enforcement]
+  end
+
+  engineer -->|commit changes| git
+  git -->|root config, request, chart| argocd
+  git -->|team workload source| argocd
+  argocd -->|sync request and platform resources| api
+  api -->|admission check| policy
+  api -->|persist cluster state| etcd
+  argocd -->|creates resources| env
+  argocd -->|creates policy resources| netpol
+  argocd -->|creates child Application| api
+  api -->|watches Gateway API resources| envoy
+  envoy -->|routes traffic| workloads
+  argocd -->|syncs child Application| workloads
+  netpol -->|enforced by| calico
+
+  classDef actor fill:#fff4dc,stroke:#ad7400,color:#392500;
+  classDef git fill:#f2e9ff,stroke:#7045a5,color:#2d1943;
+  classDef platform fill:#e8f1ff,stroke:#3267a8,color:#173553;
+  classDef data fill:#eff8ee,stroke:#4c8147,color:#1f3a1d;
+  class engineer actor;
+  class git git;
+  class argocd,api,policy,calico platform;
+  class etcd,env,netpol,workloads data;

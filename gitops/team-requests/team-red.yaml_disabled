@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: team-red
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  labels:
+    app.kubernetes.io/part-of: team-environments
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/nico-1512/kiratech-challenge.git
+    targetRevision: main
+    path: gitops/platform/team-environments
+    helm:
+      valuesObject:
+        teamName: red
+        size: G
+        teamRepository: https://github.com/nico-1512/kiratech-challenge.git
+        teamPath: gitops/team-workloads/red
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

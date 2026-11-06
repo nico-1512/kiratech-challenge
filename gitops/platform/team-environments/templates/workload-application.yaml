@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: workloads-{{ .Values.teamName }}
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  labels:
+    app.kubernetes.io/part-of: team-environments
+spec:
+  project: default
+  source:
+    repoURL: {{ .Values.teamRepository | quote }}
+    targetRevision: main
+    path: {{ .Values.teamPath | quote }}
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: team-{{ .Values.teamName }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=false
